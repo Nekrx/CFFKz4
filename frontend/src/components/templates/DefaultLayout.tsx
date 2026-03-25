@@ -1,6 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import Header from '../organisms/Header';
+import ListSearch from '../molecules/ListSearch';
 
 const LayoutContainer = styled.div`
   display: flex;
@@ -27,6 +28,7 @@ export const DefaultLayout: React.FC<DefaultLayoutProps> = ({ children }) => {
     <LayoutContainer>
       <Header />
       <MainContent>
+        <ListSearch />
         {children}
       </MainContent>
     </LayoutContainer>
