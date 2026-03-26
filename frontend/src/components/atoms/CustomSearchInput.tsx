@@ -1,9 +1,12 @@
+import React from 'react';
 import styled from 'styled-components';
 import { theme } from '../../styles/theme';
+import { Search } from 'lucide-react';
 
-interface InputProps {
+interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   label?: string;
   width?: string;
+  onSearch?: () => void; 
 }
 
 const Container = styled.div<{ width?: string }>`
@@ -44,10 +47,15 @@ const StyledInput = styled.input`
 const SearchIcon = styled.span`
   position: absolute;
   right: 15px;
-  pointer-events: none;
-  font-weight: bold;
-  font-size: 20px;
+  cursor: pointer;
   color: #000000;
+  transition: transform 0.2s;
+  display: flex;
+  align-items: center;
+
+  &:hover {
+    transform: scale(1.2);
+  }
 `;
 
 const Label = styled.span`
@@ -58,12 +66,25 @@ const Label = styled.span`
   font-family: sans-serif;
 `;
 
-export const CustomSearchInput: React.FC<InputProps & React.InputHTMLAttributes<HTMLInputElement>> = ({ label, width, ...rest }) => {
-  return (
+export const CustomSearchInput: React.FC<InputProps> = ({ label, width, onSearch, ...rest }) => {
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter' && onSearch) {
+      onSearch();
+    }
+    if (rest.onKeyDown) {
+      rest.onKeyDown(e);
+    }
+  };
+
+ return (
     <Container width={width}>
       <InputWrapper>
-        <StyledInput {...rest} />
-        <SearchIcon>🔍</SearchIcon>
+        <StyledInput {...rest} onKeyDown={handleKeyDown} />
+        <SearchIcon onClick={onSearch}>
+          <Search size={20} strokeWidth={2.5} /> 
+        </SearchIcon>
+        
       </InputWrapper>
       {label && <Label>{label}</Label>}
     </Container>
