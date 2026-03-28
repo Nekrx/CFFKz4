@@ -26,7 +26,6 @@ export const SearchButtonBox = styled.div<BoxProps>`
   border-radius: ${(props) => (props.isOpen ? '16px 16px 0 0' : '16px')};
   cursor: text;
   transition: all 0.2s ease-in-out;
-
   input {
     flex: 1;
     background: transparent;
@@ -36,22 +35,18 @@ export const SearchButtonBox = styled.div<BoxProps>`
     font-weight: bold;
     text-align: center;
     outline: none;
-
     &::placeholder {
       color: rgba(0, 0, 0, 0.8);
     }
   }
-
   .icon-search {
     color: #333;
     cursor: pointer;
   }
-
   &:hover {
     background-color: #d15c3c;
   }
 `;
-
 export const DropdownMenu = styled.ul`
   position: absolute;
   top: 100%;
@@ -69,19 +64,20 @@ export const DropdownMenu = styled.ul`
   max-height: 250px;
   overflow-y: auto;
 `;
-
-export const DropdownItem = styled.li`
+interface DropdownItemProps {
+  isHighlighted?: boolean;
+}
+export const DropdownItem = styled.li<DropdownItemProps>`
   padding: 12px 24px;
   color: #242424;
   cursor: pointer;
   font-size: 1rem;
   transition: background 0.2s;
-
+  background-color: ${(props) => (props.isHighlighted ? '#f5f5f5' : 'transparent')};
   &:hover {
     background-color: #f5f5f5;
   }
 `;
-
 export const CreateItem = styled(DropdownItem)`
   color: #c05030;
   font-weight: bold;
@@ -90,53 +86,5 @@ export const CreateItem = styled(DropdownItem)`
   strong {
     color: #242424;
     text-decoration: underline;
-  }
-`;
-
-export const ModalOverlay = styled.div`
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  background: rgba(0, 0, 0, 0.6);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 1000;
-`;
-
-//Pop-up
-export const ModalContent = styled.div`
-  background: white;
-  padding: 2rem;
-  border-radius: 16px;
-  text-align: center;
-  max-width: 400px;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-
-  h3 {
-    color: #c05030;
-    margin-bottom: 1rem;
-  }
-
-  p {
-    margin-bottom: 0.5rem;
-    color: #555;
-  }
-
-  button {
-    margin-top: 1.5rem;
-    padding: 10px 25px;
-    background: #c05030;
-    color: white;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    font-weight: bold;
-    
-    &:hover {
-      background: #a04020;
-    }
   }
 `;

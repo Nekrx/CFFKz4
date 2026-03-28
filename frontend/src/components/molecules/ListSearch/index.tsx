@@ -1,4 +1,5 @@
-import React, { useState, useMemo, useRef } from 'react';
+import React, { useState, useMemo, useRef, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Search } from 'lucide-react';
 import * as S from './styles';
 
@@ -10,22 +11,28 @@ const mockLists = [
 ];
 
 const ListSearch: React.FC = () => {
+  const navigate = useNavigate();
+  
   const [searchTerm, setSearchTerm] = useState('');
   const [isOpen, setIsOpen] = useState(false);
-  const [showModal, setShowModal] = useState(false);
-  const [modalTerm, setModalTerm] = useState('');
   const inputRef = useRef<HTMLInputElement>(null);
+  const [highlightedIndex, setHighlightedIndex] = useState(-1);
 
   const filteredLists = useMemo(() => {
+    const termLower = searchTerm.trim().toLowerCase();
+    if (!termLower) return mockLists;
+
     return mockLists.filter((list) =>
-      list.name.toLowerCase().includes(searchTerm.toLowerCase())
+      list.name.toLowerCase().includes(termLower)
     );
   }, [searchTerm]);
 
+  useEffect(() => {
+    setHighlightedIndex(-1);
+  }, [searchTerm]);
+
   const handleCreateNew = () => {
-    setModalTerm(searchTerm);
-    setShowModal(true);
-    console.log(`Tentando criar a lista: ${searchTerm} no endpoint http://localhost:3333/lists`);
+    navigate('/ver-listas', { state: { listName: searchTerm, autoLoad: true } }); 
     setSearchTerm('');
     setIsOpen(false);
   };
@@ -33,8 +40,52 @@ const ListSearch: React.FC = () => {
   const handleSelect = (name: string) => {
     setSearchTerm(name);
     setIsOpen(false);
+    navigate('/ver-listas', { state: { listName: name, autoLoad: true } });
   };
 
+  const handleExecuteSearch = () => {
+    if (searchTerm.trim() !== '') {
+      setIsOpen(false); 
+      inputRef.current?.blur(); 
+      navigate('/ver-listas', { state: { listName: searchTerm, autoLoad: true } });
+    }
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'ArrowDown' && !isOpen) {
+      setIsOpen(true);
+      return;
+    }
+
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      setHighlightedIndex((prev) => 
+        prev < filteredLists.length - 1 ? prev + 1 : prev
+      );
+    } 
+    else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      setHighlightedIndex((prev) => (prev > 0 ? prev - 1 : -1));
+    } 
+    else if (e.key === 'ArrowRight') {
+      if (filteredLists.length > 0) {
+        e.preventDefault();
+        const indexToComplete = highlightedIndex >= 0 ? highlightedIndex : 0;
+        setSearchTerm(filteredLists[indexToComplete].name);
+      }
+    } 
+    else if (e.key === 'Enter') {
+      e.preventDefault();
+      if (highlightedIndex >= 0 && filteredLists[highlightedIndex]) {
+        handleSelect(filteredLists[highlightedIndex].name);
+      } else {
+        handleExecuteSearch();
+      }
+    }
+    else if (e.key === 'Escape') {
+      setIsOpen(false);
+    }
+  };
   return (
     <S.Container>
       <S.DropdownWrapper>
@@ -47,15 +98,25 @@ const ListSearch: React.FC = () => {
             onFocus={() => setIsOpen(true)}
             onBlur={() => setTimeout(() => setIsOpen(false), 250)}
             onChange={(e) => setSearchTerm(e.target.value)}
+            onKeyDown={handleKeyDown} 
           />
-          <Search size={22} className="icon-search" />
+          <Search 
+            size={22} 
+            className="icon-search" 
+            onClick={handleExecuteSearch} 
+            style={{ cursor: 'pointer' }} 
+          />
         </S.SearchButtonBox>
-
         {isOpen && (
           <S.DropdownMenu>
             {filteredLists.length > 0 ? (
-              filteredLists.map((list) => (
-                <S.DropdownItem key={list.id} onClick={() => handleSelect(list.name)}>
+              filteredLists.map((list, index) => (
+                <S.DropdownItem 
+                  key={list.id} 
+                  onClick={() => handleSelect(list.name)}
+                  isHighlighted={highlightedIndex === index} 
+                  onMouseEnter={() => setHighlightedIndex(index)}
+                >
                   {list.name}
                 </S.DropdownItem>
               ))
@@ -74,16 +135,6 @@ const ListSearch: React.FC = () => {
           </S.DropdownMenu>
         )}
       </S.DropdownWrapper>
-      {showModal && (
-        <S.ModalOverlay onClick={() => setShowModal(false)}>
-          <S.ModalContent onClick={(e) => e.stopPropagation()}>
-            <h3>🚧 Em Construção</h3>
-            <p>Estamos trabalhando na criação da lista: <strong>{modalTerm}</strong></p>
-            <p>Em breve você poderá organizar seus cards aqui!</p>
-            <button onClick={() => setShowModal(false)}>Entendi!</button>
-          </S.ModalContent>
-        </S.ModalOverlay>
-      )}
     </S.Container>
   );
 };

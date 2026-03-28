@@ -1,38 +1,43 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { DefaultLayout } from '../../components/templates/DefaultLayout';
 import { CustomSelect } from '../../components/atoms/CustomSelect';
 import { CustomSearchInput } from '../../components/atoms/CustomSearchInput';
 import { LANGUAGES, QUALITIES, GAMES, EXTRAS, Option } from '../../constants/gameOptions';
-
 import { CardGridItem } from '../../components/atoms/CardGridItem';
 import * as S from './styles';
-
+const mockCardsData = [
+  { id: 1, name: "Ace & Sabo & Luffy" },
+  { id: 2, name: "Roronoa Zoro" },
+  { id: 3, name: "Sanji" },
+  { id: 4, name: "Monkey D. Luffy" },
+  { id: 5, name: "Nami" },
+  { id: 6, name: "Tony Tony Chopper" },
+  { id: 7, name: "Nico Robin" },
+  { id: 8, name: "Franky" },
+];
 export const DashboardPage: React.FC = () => {
+  const navigate = useNavigate(); 
   const [game, setGame] = useState('one-piece');
   const [search, setSearch] = useState('');
-  
   const [quality, setQuality] = useState('nm');
   const [isQualityOpen, setIsQualityOpen] = useState(false);
-  
   const [language, setLanguage] = useState('en');
   const [isLanguageOpen, setIsLanguageOpen] = useState(false);
-
-  const [showModal, setShowModal] = useState(false);
-  
-  const handleSearchClick = () => {
-    console.log(`Buscando a carta: "${search}" no jogo: ${game}`);
-    console.log(`Filtros -> Qualidade: ${quality} | Idioma: ${language} | Extras:`, selectedExtras);
-    setShowModal(true);
-  };
-  
   const [selectedExtras, setSelectedExtras] = useState<string[]>([]);
   const [isExtrasOpen, setIsExtrasOpen] = useState(false);
-
-  const mockCards = Array.from({ length: 12 }, (_, i) => ({
-    id: i,
-    name: i % 2 === 0 ? "Placeholder1.0" : "Placeholder2.0"
-  }));
-
+  const [displayedCards, setDisplayedCards] = useState(mockCardsData);
+  const handleSearchClick = () => {
+    console.log(`Buscando a carta: "${search}" no jogo: ${game}`);
+    if (search.trim() === '') {
+      setDisplayedCards(mockCardsData);
+    } else {
+      const resultados = mockCardsData.filter((card) => 
+        card.name.toLowerCase().includes(search.toLowerCase())
+      );
+      setDisplayedCards(resultados);
+    }
+  };
   const handleToggleExtra = (value: string) => {
     setSelectedExtras((prev) => 
       prev.includes(value) 
@@ -40,7 +45,6 @@ export const DashboardPage: React.FC = () => {
         : [...prev, value]
     );
   };
-
   return (
     <DefaultLayout>
       <S.DashboardWrapper>
@@ -123,21 +127,15 @@ export const DashboardPage: React.FC = () => {
         </S.FiltersRow>
         
         <S.CardGrid>
-          {mockCards.map((card) => (
+          {displayedCards.map((card) => (
             <CardGridItem key={card.id} name={card.name} />
           ))}
+          {displayedCards.length === 0 && (
+            <div style={{ gridColumn: '1 / -1', textAlign: 'center', marginTop: '20px', fontWeight: 'bold' }}>
+              Nenhuma carta encontrada para "{search}".
+            </div>
+          )}
         </S.CardGrid>
-        {showModal && (
-          <S.ModalOverlay onClick={() => setShowModal(false)}>
-            <S.ModalContent onClick={(e) => e.stopPropagation()}>
-              <h3>🚧 Em Construção</h3>
-              <p>O sistema de busca avançada está sendo preparado!</p>
-              <p>Em breve você verá os resultados para:</p>
-              <p><strong>{search || "Nenhuma carta digitada"}</strong></p>
-              <button onClick={() => setShowModal(false)}>Entendi!</button>
-            </S.ModalContent>
-          </S.ModalOverlay>
-        )}
 
       </S.DashboardWrapper>
     </DefaultLayout>
