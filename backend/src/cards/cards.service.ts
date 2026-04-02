@@ -1,17 +1,18 @@
 import { Injectable } from '@nestjs/common';
+import { PrismaService } from '../prisma/prisma.service';
 
 @Injectable()
 export class CardsService {
-  private cards = [
-    { id: 1, name: 'Ace & Sabo & Luffy', game: 'One Piece TCG', rarity: 'Super Parallel' },
-    { id: 2, name: 'Roronoa Zoro', game: 'One Piece TCG', rarity: 'SR' },
-    { id: 3, name: 'Draven', game: 'Riftbound', rarity: 'Rare' },
-  ];
+  constructor(private prisma: PrismaService) {}
 
-  findAll(game?: string, search?: string) {
-    let filtered = this.cards;
-    if (game) filtered = filtered.filter(c => c.game === game);
-    if (search) filtered = filtered.filter(c => c.name.toLowerCase().includes(search.toLowerCase()));
-    return filtered;
-  }
+async findAll(game?: string, search?: string) {
+  return this.prisma.card.findMany({
+    where: {
+      AND: [
+        game ? { game: { contains: game, mode: 'insensitive' } } : {},
+        search ? { name: { contains: search, mode: 'insensitive' } } : {},
+      ],
+    },
+  });
+}
 }

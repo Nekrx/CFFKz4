@@ -14,7 +14,7 @@ export const DropdownWrapper = styled.div`
 `;
 
 interface BoxProps {
-  isOpen: boolean;
+  $isOpen: boolean;
 }
 
 export const SearchButtonBox = styled.div<BoxProps>`
@@ -23,9 +23,11 @@ export const SearchButtonBox = styled.div<BoxProps>`
   align-items: center;
   padding: 12px 24px;
   background-color: #c05030;
-  border-radius: ${(props) => (props.isOpen ? '16px 16px 0 0' : '16px')};
+  /* Mudamos aqui para $isOpen */
+  border-radius: ${(props) => (props.$isOpen ? '16px 16px 0 0' : '16px')};
   cursor: text;
   transition: all 0.2s ease-in-out;
+
   input {
     flex: 1;
     background: transparent;
@@ -35,18 +37,22 @@ export const SearchButtonBox = styled.div<BoxProps>`
     font-weight: bold;
     text-align: center;
     outline: none;
+
     &::placeholder {
       color: rgba(0, 0, 0, 0.8);
     }
   }
+
   .icon-search {
     color: #333;
     cursor: pointer;
   }
+
   &:hover {
     background-color: #d15c3c;
   }
 `;
+
 export const DropdownMenu = styled.ul`
   position: absolute;
   top: 100%;
@@ -64,20 +70,24 @@ export const DropdownMenu = styled.ul`
   max-height: 250px;
   overflow-y: auto;
 `;
+
 interface DropdownItemProps {
-  isHighlighted?: boolean;
+  $isHighlighted?: boolean;
 }
+
 export const DropdownItem = styled.li<DropdownItemProps>`
   padding: 12px 24px;
   color: #242424;
   cursor: pointer;
   font-size: 1rem;
   transition: background 0.2s;
-  background-color: ${(props) => (props.isHighlighted ? '#f5f5f5' : 'transparent')};
+  background-color: ${(props) => (props.$isHighlighted ? '#f5f5f5' : 'transparent')};
+
   &:hover {
     background-color: #f5f5f5;
   }
 `;
+
 export const CreateItem = styled(DropdownItem)`
   color: #c05030;
   font-weight: bold;

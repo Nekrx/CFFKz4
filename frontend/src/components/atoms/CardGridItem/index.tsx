@@ -4,9 +4,10 @@ import * as S from './styles';
 
 interface CardGridItemProps {
   name: string;
+  image?: string;
 }
 
-export const CardGridItem: React.FC<CardGridItemProps> = ({ name }) => {
+export const CardGridItem: React.FC<CardGridItemProps> = ({ name, image }) => {
   const [quantity, setQuantity] = useState(1);
 
   const handleDecrease = () => {
@@ -19,10 +20,16 @@ export const CardGridItem: React.FC<CardGridItemProps> = ({ name }) => {
 
   return (
     <S.CardContainer>
-      <S.CardImagePlaceholder>
-        <span>✦</span>
-      </S.CardImagePlaceholder>
-      <S.CardName>{name}</S.CardName>
+      {image ? (
+        <S.CardImage src={image} alt={name} />
+      ) : (
+        <S.CardImagePlaceholder>
+          <span>✦</span>
+        </S.CardImagePlaceholder>
+      )}
+
+      <S.CardName title={name}>{name}</S.CardName>
+      
       <S.QuantitySelector>
         <button onClick={handleDecrease}>
           <HiOutlineMinus size={18} />

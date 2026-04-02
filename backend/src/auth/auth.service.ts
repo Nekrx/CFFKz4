@@ -1,19 +1,19 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { PrismaService } from '../prisma/prisma.service';
 
 @Injectable()
 export class AuthService {
-  async validateUser(email: string, pass: string) {
-    const emailDoEnv = process.env.ADMIN_EMAIL;
-    const senhaDoEnv = process.env.ADMIN_PASS;
+  constructor(private prisma: PrismaService) {}
 
-    if (email === emailDoEnv && pass === senhaDoEnv) {
-      return {
-        email: email,
-        name: 'Joãozinho',
-        token: 'fake-jwt-token-123',
-      };
+  async validateUser(email: string, pass: string) {
+    const user = await this.prisma.user.findUnique({
+      where: { email },
+    });
+    if (user) {
+      const { ...result } = user;
+      return result;
     }
 
-    throw new UnauthorizedException('Usuário ou senha inválidos');
+    throw new UnauthorizedException('Usuário não encontrado no banco');
   }
 }

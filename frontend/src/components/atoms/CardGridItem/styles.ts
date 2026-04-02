@@ -10,12 +10,21 @@ export const CardContainer = styled.div`
   border-radius: 12px;
   width: 100%;
   box-shadow: 8px 8px 0px #000; 
-  
   transition: transform 0.2s ease;
   
   &:hover {
     transform: translateY(-5px);
   }
+`;
+
+export const CardImage = styled.img`
+  width: 100%;
+  aspect-ratio: 2.5 / 3.5;
+  object-fit: cover;
+  border: 1px solid #1a1a1a;
+  border-radius: 4px;
+  margin-bottom: 15px;
+  background-color: #f0f0f0;
 `;
 
 export const CardImagePlaceholder = styled.div`
@@ -27,7 +36,7 @@ export const CardImagePlaceholder = styled.div`
   align-items: center;
   justify-content: center;
   margin-bottom: 15px;
-  
+  border-radius: 4px;
   span {
     font-size: 3rem;
     color: #888;
@@ -57,13 +66,11 @@ export const QuantitySelector = styled.div`
   padding: 5px 20px;
   width: 100%;
   user-select: none;
-
   span {
     font-size: 18px;
     font-weight: bold;
     color: #000;
   }
-
   button {
     background: none;
     border: none;

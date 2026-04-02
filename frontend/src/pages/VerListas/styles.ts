@@ -5,7 +5,7 @@ export const PageContainer = styled.div`
   flex-direction: column;
   align-items: center;
   width: 100%;
-  padding: 40px 20px;
+  padding: 10px 20px 40px 20px; 
   background-color: transparent; 
 `;
 
@@ -15,9 +15,9 @@ export const ControlsContainer = styled.div`
   align-items: center;
   width: 100%;
   max-width: 600px;
-  gap: 25px;
-  margin-bottom: 40px;
-  padding: 20px 0;
+  gap: 15px; 
+  margin-bottom: 20px; 
+  padding: 0; 
 `;
 
 export const CheckboxGroup = styled.div`
@@ -26,19 +26,20 @@ export const CheckboxGroup = styled.div`
   gap: 20px;
   flex-wrap: wrap;
   justify-content: center;
+  margin-top: 5px; 
 
   label {
     display: flex;
     align-items: center;
     gap: 8px;
-    font-size: 18px;
+    font-size: 16px; 
     font-weight: bold;
     color: #000;
     cursor: pointer;
 
     input[type="checkbox"] {
-      width: 20px;
-      height: 20px;
+      width: 18px;
+      height: 18px;
       cursor: pointer;
       accent-color: #000; 
       border: 2px solid #000;
@@ -83,12 +84,14 @@ export const SelectedListDisplay = styled.div<{ hasList: boolean }>`
     text-decoration: underline;
   }
 `;
+
 export const ListContainer = styled.div`
   width: 100%;
   max-width: 900px;
   display: flex;
   flex-direction: column;
 `;
+
 export const TableHeader = styled.div`
   display: grid;
   grid-template-columns: 80px 80px 3fr 1fr 1fr 1fr 40px;
@@ -98,24 +101,7 @@ export const TableHeader = styled.div`
   padding: 10px 15px;
   align-items: center;
   text-align: center;
-  div:nth-child(3) {
-    text-align: left;
-  }
-`;
-export const CardRowWrapper = styled.div`
-  display: flex;
-  flex-direction: column;
-  margin-bottom: 5px;
-  position: relative;
-`;
-export const CardPlaceholder = styled.div`
-  width: 45px;
-  height: 60px;
-  background-color: #eee; 
-  border: 2px solid #000; 
-  border-radius: 6px;
-  margin: 0 auto;
-  display: block;
+  div:nth-child(3) { text-align: left; }
 `;
 
 export const TableRow = styled.div`
@@ -134,9 +120,7 @@ export const TableRow = styled.div`
     transform: translateY(-2px);
     box-shadow: 2px 2px 0px #000;
   }
-  div:nth-child(3) {
-    text-align: left;
-  }
+  div:nth-child(3) { text-align: left; }
   img {
     width: 45px;
     height: 60px;
@@ -154,6 +138,14 @@ export const TableRow = styled.div`
     &:hover { color: #D15B35; }
   }
 `;
+
+export const CardRowWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 5px;
+  position: relative;
+`;
+
 export const SubMenuBox = styled.div<{ columns: number }>`
   background-color: #fff;
   border: 2px solid #000;
@@ -170,30 +162,19 @@ export const SubMenuBox = styled.div<{ columns: number }>`
     display: flex;
     flex-direction: column;
     gap: 5px;
-    span:first-child {
-      font-size: 14px;
-      font-weight: bold;
-      color: #666;
-    }
-    span:last-child {
-      font-size: 16px;
-      font-weight: bold;
-      color: #000;
-    }
+    span:first-child { font-size: 14px; font-weight: bold; color: #666; }
+    span:last-child { font-size: 16px; font-weight: bold; color: #000; }
   }
 `;
+
 export const SummarySection = styled.div`
   width: 100%;
   max-width: 900px;
   margin-top: 40px;
   margin-bottom: 60px;
-  h3 {
-    font-size: 20px;
-    font-weight: bold;
-    color: #000;
-    margin-bottom: 15px;
-  }
+  h3 { font-size: 20px; font-weight: bold; color: #000; margin-bottom: 15px; }
 `;
+
 export const SummaryTable = styled.div<{ columns: number }>`
   display: grid;
   grid-template-columns: repeat(${(props) => props.columns}, 1fr);
@@ -207,10 +188,6 @@ export const SummaryTable = styled.div<{ columns: number }>`
     display: flex;
     flex-direction: column;
     gap: 10px;
-    span {
-      font-size: 16px;
-      font-weight: bold;
-      color: #000;
-    }
+    span { font-size: 16px; font-weight: bold; color: #000; }
   }
 `;

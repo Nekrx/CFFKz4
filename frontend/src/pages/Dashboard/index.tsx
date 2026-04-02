@@ -1,23 +1,18 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
+import { useAuth } from '../../hooks/useAuth'; 
 import { DefaultLayout } from '../../components/templates/DefaultLayout';
 import { CustomSelect } from '../../components/atoms/CustomSelect';
 import { CustomSearchInput } from '../../components/atoms/CustomSearchInput';
 import { LANGUAGES, QUALITIES, GAMES, EXTRAS, Option } from '../../constants/gameOptions';
 import { CardGridItem } from '../../components/atoms/CardGridItem';
 import * as S from './styles';
-const mockCardsData = [
-  { id: 1, name: "Ace & Sabo & Luffy" },
-  { id: 2, name: "Roronoa Zoro" },
-  { id: 3, name: "Sanji" },
-  { id: 4, name: "Monkey D. Luffy" },
-  { id: 5, name: "Nami" },
-  { id: 6, name: "Tony Tony Chopper" },
-  { id: 7, name: "Nico Robin" },
-  { id: 8, name: "Franky" },
-];
+
 export const DashboardPage: React.FC = () => {
   const navigate = useNavigate(); 
+  const { email: userEmail } = useAuth(); 
+
   const [game, setGame] = useState('one-piece');
   const [search, setSearch] = useState('');
   const [quality, setQuality] = useState('nm');
@@ -26,25 +21,42 @@ export const DashboardPage: React.FC = () => {
   const [isLanguageOpen, setIsLanguageOpen] = useState(false);
   const [selectedExtras, setSelectedExtras] = useState<string[]>([]);
   const [isExtrasOpen, setIsExtrasOpen] = useState(false);
-  const [displayedCards, setDisplayedCards] = useState(mockCardsData);
-  const handleSearchClick = () => {
-    console.log(`Buscando a carta: "${search}" no jogo: ${game}`);
-    if (search.trim() === '') {
-      setDisplayedCards(mockCardsData);
-    } else {
-      const resultados = mockCardsData.filter((card) => 
-        card.name.toLowerCase().includes(search.toLowerCase())
-      );
-      setDisplayedCards(resultados);
+  
+  const [displayedCards, setDisplayedCards] = useState<any[]>([]);
+  const [isCardsLoading, setIsCardsLoading] = useState(false);
+
+  const fetchCardsFromDB = async () => {
+    try {
+      setIsCardsLoading(true);
+      const response = await axios.get(`http://localhost:3333/cards`, {
+        params: { 
+          game: game, 
+          search: search 
+        }
+      });
+      
+      setDisplayedCards(response.data);
+    } catch (err) {
+      console.error("Erro ao carregar vitrine:", err);
+    } finally {
+      setIsCardsLoading(false);
     }
   };
+
+  useEffect(() => {
+    fetchCardsFromDB();
+  }, [game]);
+
+  const handleSearchClick = () => {
+    fetchCardsFromDB();
+  };
+
   const handleToggleExtra = (value: string) => {
     setSelectedExtras((prev) => 
-      prev.includes(value) 
-        ? prev.filter((item) => item !== value)
-        : [...prev, value]
+      prev.includes(value) ? prev.filter((item) => item !== value) : [...prev, value]
     );
   };
+
   return (
     <DefaultLayout>
       <S.DashboardWrapper>
@@ -63,45 +75,40 @@ export const DashboardPage: React.FC = () => {
               onSearch={handleSearchClick}
             />
           </S.SearchColumn>    
+
           <S.RightSelectsColumn>
             <S.MultiSelectWrapper width="120px">
               <S.MultiSelectLabel>Qualidade</S.MultiSelectLabel>
               <S.MultiSelectButton onClick={() => { setIsQualityOpen(!isQualityOpen); setIsLanguageOpen(false); setIsExtrasOpen(false); }}>
                 {QUALITIES.find(q => q.value === quality)?.shortLabel}
               </S.MultiSelectButton>
-
               {isQualityOpen && (
                 <S.WideDropdown>
                   {QUALITIES.map((q: Option) => (
-                    <S.SingleOptionItem 
-                      key={q.value} 
-                      onClick={() => { setQuality(q.value); setIsQualityOpen(false); }}
-                    >
+                    <S.SingleOptionItem key={q.value} onClick={() => { setQuality(q.value); setIsQualityOpen(false); }}>
                       {q.label}
                     </S.SingleOptionItem>
                   ))}
                 </S.WideDropdown>
               )}
             </S.MultiSelectWrapper>
+
             <S.MultiSelectWrapper width="120px">
               <S.MultiSelectLabel>Idioma</S.MultiSelectLabel>
               <S.MultiSelectButton onClick={() => { setIsLanguageOpen(!isLanguageOpen); setIsQualityOpen(false); setIsExtrasOpen(false); }}>
                 {LANGUAGES.find(l => l.value === language)?.shortLabel}
               </S.MultiSelectButton>
-
               {isLanguageOpen && (
                 <S.WideDropdown>
                   {LANGUAGES.map((lang: Option) => (
-                    <S.SingleOptionItem 
-                      key={lang.value} 
-                      onClick={() => { setLanguage(lang.value); setIsLanguageOpen(false); }}
-                    >
+                    <S.SingleOptionItem key={lang.value} onClick={() => { setLanguage(lang.value); setIsLanguageOpen(false); }}>
                       {lang.label}
                     </S.SingleOptionItem>
                   ))}
                 </S.WideDropdown>
               )}
             </S.MultiSelectWrapper>
+
             <S.MultiSelectWrapper width="120px">
               <S.MultiSelectLabel>Extras</S.MultiSelectLabel>
               <S.MultiSelectButton onClick={() => { setIsExtrasOpen(!isExtrasOpen); setIsQualityOpen(false); setIsLanguageOpen(false); }}>
@@ -111,32 +118,34 @@ export const DashboardPage: React.FC = () => {
                 <S.CheckboxDropdown>
                   {EXTRAS.map((extra: Option) => (
                     <S.CheckboxLabel key={extra.value}>
-                      <input 
-                        type="checkbox" 
-                        checked={selectedExtras.includes(extra.value)}
-                        onChange={() => handleToggleExtra(extra.value)}
-                      />
+                      <input type="checkbox" checked={selectedExtras.includes(extra.value)} onChange={() => handleToggleExtra(extra.value)} />
                       {extra.label}
                     </S.CheckboxLabel>
                   ))}
                 </S.CheckboxDropdown>
               )}
             </S.MultiSelectWrapper>
-
           </S.RightSelectsColumn>
         </S.FiltersRow>
         
         <S.CardGrid>
-          {displayedCards.map((card) => (
-            <CardGridItem key={card.id} name={card.name} />
-          ))}
-          {displayedCards.length === 0 && (
+          {isCardsLoading && displayedCards.length === 0 ? (
+            <div style={{ gridColumn: '1 / -1', textAlign: 'center', fontWeight: 'bold' }}>Sincronizando banco...</div>
+          ) : (
+            displayedCards.map((card) => (
+              <CardGridItem 
+                key={card.id} 
+                name={card.name} 
+                image={card.imageUrl}
+              />
+            ))
+          )}
+          {!isCardsLoading && displayedCards.length === 0 && (
             <div style={{ gridColumn: '1 / -1', textAlign: 'center', marginTop: '20px', fontWeight: 'bold' }}>
-              Nenhuma carta encontrada para "{search}".
+              Nenhuma carta encontrada.
             </div>
           )}
         </S.CardGrid>
-
       </S.DashboardWrapper>
     </DefaultLayout>
   );

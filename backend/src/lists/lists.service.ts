@@ -1,23 +1,83 @@
-import { Injectable } from '@nestjs/common';
-import { CreateListDto } from './dto/create-list.dto';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { PrismaService } from '../prisma/prisma.service';
+import { IList } from '@shared/interfaces/list.interface'; 
 
 @Injectable()
 export class ListsService {
-  private lists = [
-    { id: 1, name: 'Lista OP Joãozinho' },
-    { id: 2, name: 'Lista OP Mariazinha' },
-  ];
+  constructor(private prisma: PrismaService) {}
 
-  create(createListDto: CreateListDto) {
-    const newList = {
-      id: Math.floor(Math.random() * 10000),
-      ...createListDto,
-    };
-    this.lists.push(newList);
-    return newList;
+  async searchLists(email: string, searchTerm?: string): Promise<IList[]> {
+    const lists = await this.prisma.list.findMany({
+      where: {
+        user: { email },
+        ...(searchTerm && {
+          name: { contains: searchTerm, mode: 'insensitive' },
+        }),
+      },
+      select: {
+        id: true,
+        name: true,
+        createdAt: true,
+      },
+      orderBy: { name: 'asc' },
+    });
+
+    return lists.map(list => ({
+      id: list.id,
+      name: list.name,
+      userEmail: email,
+      createdAt: list.createdAt,
+    }));
   }
 
-  findAll() {
-    return this.lists;
+  async createList(email: string, name: string): Promise<IList> {
+    const user = await this.prisma.user.findUnique({
+      where: { email },
+    });
+
+    if (!user) {
+      throw new NotFoundException(`Usuário com email ${email} não encontrado.`);
+    }
+
+    const newList = await this.prisma.list.create({
+      data: {
+        name,
+        userId: user.id,
+      },
+    });
+    return {
+      id: newList.id,
+      name: newList.name,
+      userEmail: email,
+      createdAt: newList.createdAt,
+    };
+  }
+
+  async getListById(id: number) {
+    const list = await this.prisma.list.findUnique({
+      where: { id },
+      include: {
+        items: {
+          include: { card: true },
+        },
+      },
+    });
+
+    if (!list) throw new NotFoundException(`Lista não encontrada`);
+    
+    return list;
+  }
+
+  async updateListItem(
+    itemId: number, 
+    data: { qty?: number; condition?: string; extra?: string; lang?: string }
+  ) {
+    const itemExists = await this.prisma.listItem.findUnique({ where: { id: itemId } });
+    if (!itemExists) throw new NotFoundException(`Item ID ${itemId} não encontrado.`);
+
+    return this.prisma.listItem.update({
+      where: { id: itemId },
+      data,
+    });
   }
 }

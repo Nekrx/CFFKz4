@@ -26,7 +26,10 @@ const Header: React.FC = () => {
 
   return (
     <S.HeaderContainer>
-      <S.LogoContainer>
+      <S.LogoContainer 
+        onClick={() => navigate('/dashboard')} 
+        style={{ cursor: 'pointer' }}
+      >
         <img src={logoCafofo} alt="Logo Cafofo" />
       </S.LogoContainer>
 

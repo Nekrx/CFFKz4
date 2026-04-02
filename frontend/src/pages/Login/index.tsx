@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
+import { useNavigate } from 'react-router-dom'; // 1. IMPORTAR
 import { Button } from '../../components/atoms/Button';
 import { InputField } from '../../components/molecules/InputField';
 import { theme } from '../../styles/theme';
@@ -27,13 +28,23 @@ const Card = styled.div`
 `;
 
 export const LoginPage: React.FC = () => {
+  const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const { login, loading } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    await login(email, password);
+    
+    try {
+      await login(email, password);
+      
+      navigate('/dashboard'); 
+      
+    } catch (err) {
+      alert("Falha no login: verifique suas credenciais ou o servidor.");
+      console.error(err);
+    }
   };
 
   return (
