@@ -26,7 +26,6 @@ const Card = styled.div`
   max-width: 480px; 
   text-align: center;
 `;
-
 export const LoginPage: React.FC = () => {
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
@@ -37,7 +36,10 @@ export const LoginPage: React.FC = () => {
     e.preventDefault();
     
     try {
-      await login(email, password);
+      const userData = await login(email, password); 
+      if (userData) {
+        localStorage.setItem('@Cafofo:User', JSON.stringify(userData));
+      }
       
       navigate('/dashboard'); 
       

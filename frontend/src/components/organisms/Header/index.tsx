@@ -11,7 +11,10 @@ const Header: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
 
-  const userName = "Joãozinho V";
+  // Lógica para pegar o nome dinâmico
+  const storedUser = JSON.parse(localStorage.getItem('@Cafofo:User') || '{}');
+  const userName = storedUser.name || "Usuário"; 
+
   const isCreationPage = location.pathname === '/dashboard';
 
   const handleTogglePage = () => {
@@ -21,6 +24,7 @@ const Header: React.FC = () => {
   const handleLogout = () => {
     setIsDropdownOpen(false);
     localStorage.removeItem('@Cafofo:Token');
+    localStorage.removeItem('@Cafofo:User'); // Limpa o usuário ao deslogar
     navigate('/login');
   };
 

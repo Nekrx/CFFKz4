@@ -9,11 +9,14 @@ export class AuthService {
     const user = await this.prisma.user.findUnique({
       where: { email },
     });
-    if (user) {
-      const { ...result } = user;
+
+    // Se o usuário existe e a senha bate (estamos comparando texto puro aqui)
+    if (user && user.password === pass) {
+      // Tiramos a senha do objeto por segurança e retornamos o resto (ID, Email e NAME A)
+      const { password, ...result } = user;
       return result;
     }
 
-    throw new UnauthorizedException('Usuário não encontrado no banco');
+    throw new UnauthorizedException('E-mail ou senha incorretos.');
   }
 }
