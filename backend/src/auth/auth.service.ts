@@ -9,10 +9,7 @@ export class AuthService {
     const user = await this.prisma.user.findUnique({
       where: { email },
     });
-
-    // Se o usuário existe e a senha bate (estamos comparando texto puro aqui)
     if (user && user.password === pass) {
-      // Tiramos a senha do objeto por segurança e retornamos o resto (ID, Email e NAME A)
       const { password, ...result } = user;
       return result;
     }
