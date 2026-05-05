@@ -2,6 +2,13 @@
   "compilerOptions": {
     "module": "nodenext",
     "moduleResolution": "nodenext",
+    "target": "ES2023",
+    "outDir": "./dist",
+    "rootDir": "../",
+    "paths": {
+      "@shared/*": ["./../shared/*"],
+      "@src/*": ["./src/*"]
+    },
     "resolvePackageJsonExports": true,
     "esModuleInterop": true,
     "isolatedModules": true,
@@ -10,10 +17,7 @@
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "allowSyntheticDefaultImports": true,
-    "target": "ES2023",
     "sourceMap": true,
-    "outDir": "./dist",
-    "baseUrl": "./",
     "rootDirs": ["src", "../shared"],  
     "incremental": true,
     "skipLibCheck": true,
@@ -21,10 +25,7 @@
     "forceConsistentCasingInFileNames": true,
     "noImplicitAny": false,
     "strictBindCallApply": false,
-    "noFallthroughCasesInSwitch": false,
-    "paths": {
-      "@shared/*": ["../shared/*"] 
-    }
+    "noFallthroughCasesInSwitch": false
   },
   "include": ["src/**/*", "../shared/**/*"]
 }
